@@ -86,10 +86,10 @@ typedef enum {
 } ak8963_mfs_sel_t;
 
 typedef enum {
-    AK8963_IF_I2C = 0,                          /*!< Interface over I2C */
-    AK8963_IF_SPI,                              /*!< Interface over SPI */
-    AK8963_IF_MAX
-} ak8963_if_protocol_t;
+    AK8963_COMM_MODE_I2C = 0,                   /*!< Interface over I2C */
+    AK8963_COMM_MODE_SPI,                              /*!< Interface over SPI */
+    AK8963_COMM_MODE_MAX
+} ak8963_comm_mode_t;
 
 typedef struct {
     i2c_num_t                   i2c_num;        /*!< AK8963 I2C num */
@@ -99,7 +99,7 @@ typedef struct {
     ak8963_mode_t               opr_mode;       /*!< AK8963 operatkion mode */
     ak8963_mfs_sel_t            mfs_sel;        /*!< AK8963 magnetometer full scale range */
     ak8963_hard_iron_bias_t     mag_bias;       /*!< AK8963 bias data */
-    ak8963_if_protocol_t        if_protocol;    /*!< AK8963 interface protocol */
+    ak8963_comm_mode_t          comm_mode;      /*!< AK8963 interface protocol */
     ak8963_hw_info_t            hw_info;        /*!< AK8963 hardware information */
 } ak8963_cfg_t;
 

@@ -58,7 +58,7 @@ typedef stm_err_t (*write_func)(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint
 typedef struct ak8963 {
     ak8963_mode_t               opr_mode;               /*!< AK8963 operatkion mode */
     ak8963_mfs_sel_t            mfs_sel;                /*!< AK8963 magnetometer full scale range */
-    ak8963_if_protocol_t        if_protocol;            /*!< AK8963 interface protocol */
+    ak8963_comm_mode_t          comm_mode;              /*!< AK8963 interface protocol */
     ak8963_hard_iron_bias_t     hard_iron_bias;         /*!< AK8963 magnetometer bias data */
     ak8963_sens_adj_t           asa;                    /*!< AK8963 magnetometer sensitive adjust data */
     ak8963_soft_iron_corr_t     soft_iron_corr;         /*!< AK8963 magnetometer scale */
@@ -92,18 +92,18 @@ static stm_err_t _i2c_read_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint
     return STM_OK;
 }
 
-static read_func _get_read_func(ak8963_if_protocol_t if_protocol)
+static read_func _get_read_func(ak8963_comm_mode_t comm_mode)
 {
-    if (if_protocol == AK8963_IF_I2C) {
+    if (comm_mode == AK8963_COMM_MODE_I2C) {
         return _i2c_read_func;
     }
 
     return NULL;
 }
 
-static write_func _get_write_func(ak8963_if_protocol_t if_protocol)
+static write_func _get_write_func(ak8963_comm_mode_t comm_mode)
 {
-    if (if_protocol == AK8963_IF_I2C) {
+    if (comm_mode == AK8963_COMM_MODE_I2C) {
         return _i2c_write_func;
     }
 
@@ -120,7 +120,7 @@ ak8963_handle_t ak8963_init(ak8963_cfg_t *config)
     AK8963_CHECK(config, AK8963_INIT_ERR_STR, return NULL);
     AK8963_CHECK(config->opr_mode < AK8963_MODE_MAX, AK8963_INIT_ERR_STR, return NULL);
     AK8963_CHECK(config->mfs_sel < AK8963_MFS_MAX, AK8963_INIT_ERR_STR, return NULL);
-    AK8963_CHECK(config->if_protocol < AK8963_IF_MAX, AK8963_INIT_ERR_STR, return NULL);
+    AK8963_CHECK(config->comm_mode < AK8963_COMM_MODE_MAX, AK8963_INIT_ERR_STR, return NULL);
 
     /* Allocate memory for handle structure */
     ak8963_handle_t handle;
@@ -128,8 +128,8 @@ ak8963_handle_t ak8963_init(ak8963_cfg_t *config)
     AK8963_CHECK(handle, AK8963_INIT_ERR_STR, return NULL);
 
     /* Get function */
-    write_func _write = _get_write_func(config->if_protocol);
-    read_func _read = _get_read_func(config->if_protocol);
+    write_func _write = _get_write_func(config->comm_mode);
+    read_func _read = _get_read_func(config->comm_mode);
 
     /* Power down AK8963 magnetic sensor */
     uint8_t buffer = 0;
@@ -183,11 +183,11 @@ ak8963_handle_t ak8963_init(ak8963_cfg_t *config)
     handle->hard_iron_bias.x_axis = 0;
     handle->hard_iron_bias.y_axis = 0;
     handle->hard_iron_bias.z_axis = 0;
-    handle->if_protocol = config->if_protocol;
+    handle->comm_mode = config->comm_mode;
     handle->lock = mutex_create();
     handle->hw_info = config->hw_info;
-    handle->_read = _get_read_func(config->if_protocol);
-    handle->_write = _get_write_func(config->if_protocol);
+    handle->_read = _get_read_func(config->comm_mode);
+    handle->_write = _get_write_func(config->comm_mode);
 
     return handle;
 }
