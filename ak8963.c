@@ -52,8 +52,8 @@ static const char* AK8963_TAG = "AK8963";
         action;                                                                       \
         }
 
-typedef stm_err_t (*read_func)(ak8963_hardware_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms);
-typedef stm_err_t (*write_func)(ak8963_hardware_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms);
+typedef stm_err_t (*read_func)(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms);
+typedef stm_err_t (*write_func)(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms);
 
 typedef struct ak8963 {
     ak8963_mode_t               opr_mode;               /*!< AK8963 operatkion mode */
@@ -63,13 +63,13 @@ typedef struct ak8963 {
     ak8963_sens_adj_t           asa;                    /*!< AK8963 magnetometer sensitive adjust data */
     ak8963_soft_iron_corr_t     soft_iron_corr;         /*!< AK8963 magnetometer scale */
     float                       mag_scaling_factor;     /*!< AK8963 magnetometer scaling factor */
-    ak8963_hardware_info_t      hw_info;                /*!< AK8963 hardware information */
+    ak8963_hw_info_t            hw_info;                /*!< AK8963 hardware information */
     SemaphoreHandle_t           lock;                   /*!< AK8963 mutex */
     read_func                   _read;                  /*!< AK8963 read function */
     write_func                  _write;                 /*!< AK8963 write function */
 } ak8963_t;
 
-static stm_err_t _i2c_write_func(ak8963_hardware_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms)
+static stm_err_t _i2c_write_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms)
 {
     uint8_t buf_send[len + 1];
     buf_send[0] = reg_addr;
@@ -82,7 +82,7 @@ static stm_err_t _i2c_write_func(ak8963_hardware_info_t hw_info, uint8_t reg_add
     return STM_OK;
 }
 
-static stm_err_t _i2c_read_func(ak8963_hardware_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms)
+static stm_err_t _i2c_read_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms)
 {
     uint8_t buffer[1];
     buffer[0] = reg_addr;
