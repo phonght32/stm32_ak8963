@@ -56,20 +56,20 @@
 // #define TEST_SCALE
 // #define AUTO_CALIB
 
-#define I2C_NUM                 I2C_NUM_1
-#define I2C_PINS_PACK           I2C_PINS_PACK_1
-#define I2C_CLK_SPEED           400000
+#define I2C_NUM                         I2C_NUM_1
+#define I2C_PINS_PACK                   I2C_PINS_PACK_1
+#define I2C_CLK_SPEED                   400000
 
-#define MPU9250_AFS_RANGE       MPU9250_AFS_SEL_8G
-#define MPU9250_FS_RAGNE        MPU9250_FS_SEL_2000
-#define MPU9250_CLKSEL          MPU9250_CLKSEL_AUTO   
-#define MPU9250_DLPF            MPU9250_41ACEL_42GYRO_BW_HZ
-#define MPU9250_SLEEP_MODE      MPU9250_DISABLE_SLEEP_MODE
-#define MPU9250_IF_PROTOCOL     MPU9250_IF_I2C
+#define MPU9250_AFS_RANGE               MPU9250_AFS_SEL_8G
+#define MPU9250_FS_RAGNE                MPU9250_FS_SEL_2000
+#define MPU9250_CLKSEL                  MPU9250_CLKSEL_AUTO   
+#define MPU9250_DLPF                    MPU9250_41ACEL_42GYRO_BW_HZ
+#define MPU9250_SLEEP_MODE              MPU9250_DISABLE_SLEEP_MODE
+#define MPU9250_COMM_MODE_PROTOCOL      MPU9250_COMM_MODE_I2C
 
-#define AK8963_MODE             AK8963_MODE_CONT_MEASUREMENT_2
-#define AK8963_RESOLUTION       AK8963_MFS_16BIT
-#define AK8963_IF_PROTOCOL      AK8963_IF_I2C
+#define AK8963_MODE                     AK8963_MODE_CONT_MEASUREMENT_2
+#define AK8963_RESOLUTION               AK8963_MFS_16BIT
+#define AK8963_COMM_MODE_PROTOCOL       AK8963_COMM_MODE_I2C
 
 /* Handle structure */
 mpu9250_handle_t mpu9250_handle;
@@ -109,7 +109,7 @@ static void example_task(void* arg)
     mpu9250_cfg.fs_sel = MPU9250_FS_RAGNE;
     mpu9250_cfg.sleep_mode = MPU9250_SLEEP_MODE;
     mpu9250_cfg.hw_info.i2c_num = I2C_NUM;
-    mpu9250_cfg.if_protocol = MPU9250_IF_PROTOCOL;
+    mpu9250_cfg.comm_mode = MPU9250_COMM_MODE_PROTOCOL;
     mpu9250_handle = mpu9250_init(&mpu9250_cfg);
 
     /* Configure AK8963 */
@@ -117,7 +117,7 @@ static void example_task(void* arg)
     ak8963_cfg.opr_mode = AK8963_MODE;
     ak8963_cfg.mfs_sel = AK8963_RESOLUTION;
     ak8963_cfg.hw_info.i2c_num = I2C_NUM;
-    ak8963_cfg.if_protocol = AK8963_IF_PROTOCOL;
+    ak8963_cfg.comm_mode = AK8963_COMM_MODE_PROTOCOL;
     ak8963_handle = ak8963_init(&ak8963_cfg);
 
 #ifdef AUTO_CALIB
