@@ -89,7 +89,7 @@ typedef enum {
 
 typedef enum {
     AK8963_COMM_MODE_I2C = 0,                   /*!< Interface over I2C */
-    AK8963_COMM_MODE_SPI,                              /*!< Interface over SPI */
+    AK8963_COMM_MODE_SPI,                       /*!< Interface over SPI */
     AK8963_COMM_MODE_MAX
 } ak8963_comm_mode_t;
 
