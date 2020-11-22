@@ -183,12 +183,12 @@ ak8963_handle_t ak8963_init(ak8963_cfg_t *config)
     uint8_t buffer = 0;
     buffer = 0x00;
     AK8963_CHECK(!_write(config->hw_info, AK8963_CNTL, &buffer, 1, TIMEOUT_MS_DEFAULT), AK8963_INIT_ERR_STR, {_ak8963_cleanup(handle); return NULL;});
-    vTaskDelay(10/portTICK_PERIOD_MS);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
 
     /* Set fuse ROM access mode */
     buffer = 0x0F;
     AK8963_CHECK(!_write(config->hw_info, AK8963_CNTL, &buffer, 1, TIMEOUT_MS_DEFAULT), AK8963_INIT_ERR_STR, {_ak8963_cleanup(handle); return NULL;});
-    vTaskDelay(10/portTICK_PERIOD_MS);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
 
     /* Read magnetic sensitivity adjustment */
     uint8_t mag_raw_data[3];
@@ -201,14 +201,14 @@ ak8963_handle_t ak8963_init(ak8963_cfg_t *config)
     /* Power down AK8963 magnetic sensor */
     buffer = 0x00;
     AK8963_CHECK(!_write(config->hw_info, AK8963_CNTL, &buffer, 1, TIMEOUT_MS_DEFAULT), AK8963_INIT_ERR_STR, {_ak8963_cleanup(handle); return NULL;});
-    vTaskDelay(10/portTICK_PERIOD_MS);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
 
     /* Configure magnetic operation mode and range */
     buffer = 0;
     buffer = (config->opr_mode) & 0x0F;
     buffer |= (config->mfs_sel << 4) & 0x10;
     AK8963_CHECK(!_write(config->hw_info, AK8963_CNTL, &buffer, 1, TIMEOUT_MS_DEFAULT), AK8963_INIT_ERR_STR, {_ak8963_cleanup(handle); return NULL;});
-    vTaskDelay(10/portTICK_PERIOD_MS);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
 
     /* Update magnetometer scaling factor */
     switch (config->mfs_sel)
