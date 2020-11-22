@@ -29,7 +29,7 @@
 
 #define TIMEOUT_MS_DEFAULT          100         /*!< Default MPU9250 I2C communiation timeout */
 #define BUFFER_CALIB_DEFAULT        1000        /*!< Default the number of sample data when calibrate */
-
+#define I2C_SPEED_DEFAULT           400000
 #define AK8963_INIT_ERR_STR         "ak8963 init error"
 #define AK8963_MALLOC_ERR_STR       "ak8963 malloc error"
 #define AK8963_TRANS_ERR_STR        "ak8963 write registers error"
@@ -52,6 +52,7 @@ static const char* AK8963_TAG = "AK8963";
         action;                                                                       \
         }
 
+typedef stm_err_t (*init_func)(ak8963_hw_info_t hw_info);
 typedef stm_err_t (*read_func)(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms);
 typedef stm_err_t (*write_func)(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms);
 
@@ -69,6 +70,22 @@ typedef struct ak8963 {
     write_func                  _write;                 /*!< AK8963 write function */
 } ak8963_t;
 
+stm_err_t _init_i2c(ak8963_hw_info_t hw_info)
+{
+    i2c_cfg_t i2c_cfg;
+    i2c_cfg.i2c_num = hw_info.i2c_num;
+    i2c_cfg.i2c_pins_pack = hw_info.i2c_pins_pack;
+    i2c_cfg.clk_speed = hw_info.i2c_speed;
+    AK8963_CHECK(!i2c_config(&i2c_cfg), AK8963_INIT_ERR_STR, return STM_FAIL);
+
+    return STM_OK;
+}
+
+stm_err_t _init_spi(ak8963_hw_info_t hw_info)
+{
+    return STM_OK;
+}
+
 static stm_err_t _i2c_write_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms)
 {
     uint8_t buf_send[len + 1];
@@ -82,6 +99,11 @@ static stm_err_t _i2c_write_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uin
     return STM_OK;
 }
 
+static stm_err_t _spi_write_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms)
+{
+    return STM_OK;
+}
+
 static stm_err_t _i2c_read_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms)
 {
     uint8_t buffer[1];
@@ -92,10 +114,28 @@ static stm_err_t _i2c_read_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint
     return STM_OK;
 }
 
+static stm_err_t _spi_read_func(ak8963_hw_info_t hw_info, uint8_t reg_addr, uint8_t *buf, uint16_t len, uint32_t timeout_ms)
+{
+    return STM_OK;
+}
+
+static init_func _get_init_func(ak8963_comm_mode_t comm_mode)
+{
+    if (comm_mode == AK8963_COMM_MODE_I2C) {
+        return _init_i2c;
+    } else {
+        return _init_spi;
+    }
+
+    return NULL;
+}
+
 static read_func _get_read_func(ak8963_comm_mode_t comm_mode)
 {
     if (comm_mode == AK8963_COMM_MODE_I2C) {
         return _i2c_read_func;
+    } else {
+        return _spi_read_func;
     }
 
     return NULL;
@@ -105,6 +145,8 @@ static write_func _get_write_func(ak8963_comm_mode_t comm_mode)
 {
     if (comm_mode == AK8963_COMM_MODE_I2C) {
         return _i2c_write_func;
+    } else {
+        return _spi_write_func;
     }
 
     return NULL;
@@ -126,6 +168,12 @@ ak8963_handle_t ak8963_init(ak8963_cfg_t *config)
     ak8963_handle_t handle;
     handle = calloc(1, sizeof(ak8963_t));
     AK8963_CHECK(handle, AK8963_INIT_ERR_STR, return NULL);
+
+    /* Init hardware */
+    if (!config->hw_info.is_init) {
+        init_func _init = _get_init_func(config->comm_mode);
+        AK8963_CHECK(!_init(config->hw_info), AK8963_INIT_ERR_STR, {_ak8963_cleanup(handle); return NULL;});
+    }
 
     /* Get function */
     write_func _write = _get_write_func(config->comm_mode);
