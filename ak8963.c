@@ -464,5 +464,5 @@ void ak8963_auto_calib(ak8963_handle_t handle)
 
 void ak8963_destroy(ak8963_handle_t handle)
 {
-    free(handle);
+    _ak8963_cleanup(handle);
 }
